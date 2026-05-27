@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RévisePro Bac</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f1f5f9;color:#0f172a}
+    .wrap{max-width:1050px;margin:auto;padding:22px}
+    .center{text-align:center}
+    .pill{display:inline-block;background:#fff;padding:10px 16px;border-radius:999px;box-shadow:0 2px 10px #0001;font-weight:700}
+    h1{font-size:38px;margin:18px 0 8px}
+    h2,h3{margin:8px 0}
+    p{color:#64748b}
+    .card{background:#fff;border-radius:22px;padding:22px;box-shadow:0 8px 24px #00000012;margin:14px 0}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+    .icon{width:52px;height:52px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;background:#e2e8f0}
+    button{border:0;border-radius:16px;padding:13px 16px;font-weight:700;cursor:pointer;background:#0f172a;color:white}
+    button.secondary{background:#fff;color:#0f172a;border:1px solid #cbd5e1}
+    button.green{background:#16a34a}
+    button.red{background:#dc2626}
+    .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .bar{height:12px;background:#e2e8f0;border-radius:999px;overflow:hidden}
+    .fill{height:100%;width:0;background:#0f172a;transition:.3s}
+    .fill.green{background:#16a34a}.fill.orange{background:#f97316}.fill.red{background:#dc2626}
+    .choice{width:100%;text-align:left;background:white;color:#0f172a;border:1px solid #cbd5e1;margin:6px 0;padding:15px}
+    .choice.correct{border-color:#16a34a;background:#dcfce7}
+    .choice.wrong{border-color:#dc2626;background:#fee2e2}
+    .questionCard.correct{background:#dcfce7;border:1px solid #86efac}
+    .questionCard.wrong{background:#fee2e2;border:1px solid #fca5a5}
+    .answerBox{background:white;border:1px solid #cbd5e1;border-radius:18px;padding:18px;margin-top:14px}
+    .topline{display:flex;justify-content:space-between;gap:12px;align-items:center}
+    @media(max-width:600px){h1{font-size:30px}.wrap{padding:14px}.btnrow{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+const historyDates = [
+["1944","Les femmes obtiennent le droit de vote","Les femmes deviennent électrices et éligibles."],
+["1945","Fin de la Seconde Guerre mondiale","L'Europe est affaiblie et les États-Unis et l'URSS dominent."],
+["1945","Création de l'ONU","L'ONU est créée pour maintenir la paix dans le monde."],
+["1945","Création de la Sécurité sociale","Elle protège les citoyens contre les risques sociaux."],
+["1946","Naissance de la IVe République","Régime parlementaire marqué par une forte instabilité."],
+["1947","Indépendance de l'Inde et du Pakistan","Le Royaume-Uni accorde l'indépendance à l'Inde britannique, divisée entre Inde et Pakistan."],
+["1947-1991","Guerre froide","Période de tensions entre les États-Unis et l'URSS."],
+["1948-1949","Blocus de Berlin","L'URSS bloque Berlin-Ouest ; les Américains organisent un pont aérien."],
+["1949","Création de l'OTAN","Alliance militaire du bloc occidental autour des États-Unis."],
+["1er octobre 1949","Proclamation de la République populaire de Chine","Mao Zedong proclame la République populaire de Chine."],
+["1950-1953","Guerre de Corée","Conflit entre Corée du Nord communiste et Corée du Sud soutenue par les États-Unis."],
+["1951","Création de la CECA","Première étape importante de la construction européenne."],
+["1954","Défaite française à Diên Biên Phu","Cette défaite accélère la fin de la guerre d'Indochine."],
+["1954","Projet de CED","Projet de Communauté européenne de défense finalement abandonné."],
+["1954-1962","Guerre d'Algérie","Elle provoque une crise politique majeure en France."],
+["1955","Conférence de Bandung","29 États africains et asiatiques défendent le non-alignement."],
+["1957","Traité de Rome","Il crée la CEE et renforce la construction européenne."],
+["1957","Création de la CEE","La Communauté économique européenne favorise le marché commun."],
+["1958","Proclamation de la Ve République","La Ve République renforce le pouvoir exécutif."],
+["1961","Construction du mur de Berlin","Symbole de la séparation de l'Europe en deux blocs."],
+["1962","Crise des missiles de Cuba","Le monde frôle la guerre nucléaire entre États-Unis et URSS."],
+["1962","Élection du président au suffrage universel direct","Cette réforme renforce la place du président."],
+["1968","Manifestations ouvrières et étudiantes de Mai 68","Mai 68 transforme les mentalités et entraîne des avancées sociales."],
+["1971","Entrée de la Chine populaire au Conseil de sécurité de l'ONU","La Chine populaire remplace Taïwan au Conseil de sécurité."],
+["1975","Loi Veil sur l'IVG","La loi Veil autorise l'interruption volontaire de grossesse."],
+["1975","Accords d'Helsinki","Accords pour la coopération et la sécurité en Europe."],
+["1982","Premières lois de décentralisation","Elles donnent plus de pouvoirs aux collectivités territoriales."],
+["1985","Création du baccalauréat professionnel","Il valorise la formation professionnelle."],
+["1989","Chute du mur de Berlin","Elle symbolise la fin du bloc de l'Est en Europe."],
+["1991","Disparition de l'URSS","La guerre froide prend fin."],
+["1991","Première guerre du Golfe","Coalition menée par les États-Unis contre l'Irak après l'invasion du Koweït."],
+["1992","Traité de Maastricht","Il renforce l'Union européenne."],
+["2000","Loi sur la parité aux élections","Elle favorise l'égal accès des femmes et des hommes aux mandats."],
+["2001","Attentats du 11 septembre","Les attentats d'Al-Qaïda bouleversent les relations internationales."],
+["2004","Charte de l'environnement","La protection de l'environnement devient un principe important."]
+];
+
+function q(question,answer,choices,explanation){return {question,answer,choices,explanation};}
+const base = {
+francaisReferences:{title:"Références de français",icon:"📚",color:"#f3e8ff",questions:[
+q("Quel film critique le travail à la chaîne et la cadence industrielle ?","Les Temps modernes",["Les Temps modernes","Le Dictateur","La Ruée vers l'or","City Lights"],"Chaplin montre un ouvrier dominé par les machines et les cadences."),
+q("Que symbolise la scène des engrenages dans Les Temps modernes ?","L'homme écrasé par les cadences de la société industrielle",["L'homme écrasé par les cadences de la société industrielle","La liberté politique","La construction européenne","Le non-alignement"],"Chaplin montre un homme presque transformé en machine."),
+q("Quelle œuvre de Boris Vian parle de Colin et Chloé ?","L'Écume des jours",["L'Écume des jours","Germinal","La Peste","1984"],"Le roman montre un bonheur fragile détruit par la maladie, l'argent et le travail."),
+q("Que représente le nénuphar dans le poumon de Chloé ?","La maladie qui détruit progressivement le bonheur",["La maladie qui détruit progressivement le bonheur","La victoire sportive","Le progrès technique","Le débat démocratique"],"Le nénuphar symbolise la fragilité du bonheur."),
+q("Quel personnage devient obsédé par Jean-Sol Partre dans L'Écume des jours ?","Chick",["Chick","Colin","Chloé","Zátopek"],"Chick critique les effets de mode et la société de consommation."),
+q("Dans Courir, que représente Emil Zátopek ?","Le culte de la performance",["Le culte de la performance","Le repos absolu","La décolonisation","Le pluralisme"],"Jean Echenoz montre l'obsession de la vitesse et du dépassement."),
+q("Quelle œuvre de Leïla Slimani parle de silence et de solitude ?","Le parfum des fleurs la nuit",["Le parfum des fleurs la nuit","Chanson douce","Germinal","Candide"],"Slimani montre le besoin de ralentir et de se retrouver soi-même."),
+q("Que critique la chanson Time de Pink Floyd ?","Le temps qui passe sans qu'on en profite",["Le temps qui passe sans qu'on en profite","La guerre froide","La construction européenne","Les risques naturels"],"La chanson rappelle que les années peuvent filer sans qu'on s'en rende compte.")
+]},
+francaisCours:{title:"Cours de français",icon:"🧠",color:"#fce7f3",questions:[
+q("Quel est le thème du programme de français ?","Rythmes et cadences de la vie moderne : quel temps pour soi ?",["Rythmes et cadences de la vie moderne : quel temps pour soi ?","Les hommes face aux risques","Vivre en démocratie","Le jeu des puissances"],"Le thème interroge la place du temps personnel dans la vie moderne."),
+q("Que doit contenir une introduction ?","Accroche, sujet, problématique et annonce du plan",["Accroche, sujet, problématique et annonce du plan","Seulement une citation","Une liste de dates","Une conclusion"],"L'introduction prépare clairement le développement."),
+q("Quelle structure simple est recommandée pour le développement ?","Thèse, antithèse, synthèse",["Thèse, antithèse, synthèse","Carte, schéma, croquis","Date, lieu, acteur","Définition, exemple, image"],"Ce plan permet de présenter plusieurs points de vue avant de nuancer."),
+q("Quelle est la formule magique d'un paragraphe ?","Idée → explication → exemple → lien avec le sujet",["Idée → explication → exemple → lien avec le sujet","Titre → auteur → date","Question → réponse courte","Exemple → exemple → exemple"],"Cette structure rend le raisonnement clair."),
+q("Que signifie défendre une thèse ?","Défendre une idée avec des arguments et des exemples",["Défendre une idée avec des arguments et des exemples","Raconter sans analyser","Donner seulement son avis","Copier le sujet"],"Une thèse doit être justifiée."),
+q("Que signifie nuancer son point de vue ?","Reconnaître qu'une idée peut avoir des limites",["Reconnaître qu'une idée peut avoir des limites","Changer de sujet","Écrire sans exemple","Refuser d'argumenter"],"La nuance rend la copie plus convaincante.")
+]},
+geo:{title:"Programme de géographie",icon:"🌍",color:"#dcfce7",questions:[
+q("Quel est le thème général du programme de géographie ?","Les hommes face aux changements globaux",["Les hommes face aux changements globaux","Le monde depuis 1945","La monarchie","La Renaissance"],"Le programme étudie les ressources, les risques et l'adaptation des sociétés."),
+q("Que provoque la croissance démographique sur les ressources ?","Une pression plus forte sur les ressources",["Une pression plus forte sur les ressources","La disparition des villes","La fin des mobilités","La baisse automatique des besoins"],"Plus la population augmente, plus les besoins augmentent."),
+q("Que signifie accessibilité d'une ressource ?","La possibilité d'accéder concrètement à une ressource",["La possibilité d'accéder concrètement à une ressource","Une alliance militaire","Une élection","Une crise politique"],"Une ressource peut exister sans être accessible à tous."),
+q("Que sont les ODD ?","Les Objectifs de développement durable de l'ONU",["Les Objectifs de développement durable de l'ONU","Des organisations militaires","Des élections locales","Des risques industriels"],"Les 17 ODD cherchent à répondre aux défis sociaux et environnementaux."),
+q("Un risque est la combinaison de quoi ?","Un aléa et une vulnérabilité",["Un aléa et une vulnérabilité","Une date et un traité","Une loi et un président","Un pays et un drapeau"],"Un aléa devient un risque quand il menace une société vulnérable."),
+q("Que signifie prévention des risques ?","Agir avant la catastrophe pour réduire les dégâts",["Agir avant la catastrophe pour réduire les dégâts","Ne rien faire","Réagir seulement après","Supprimer tous les aléas"],"La prévention passe par l'information, l'aménagement et la réglementation.")
+]},
+histoireCours:{title:"Programme d'histoire",icon:"🏛️",color:"#dbeafe",questions:[
+q("Après 1945, quelles sont les deux superpuissances ?","Les États-Unis et l'URSS",["Les États-Unis et l'URSS","La France et l'Espagne","L'Italie et le Portugal","La Chine et le Maroc"],"L'Europe est affaiblie et ces deux puissances dominent."),
+q("Comment appelle-t-on l'affrontement indirect USA/URSS ?","La guerre froide",["La guerre froide","La décolonisation","La mondialisation","La monarchie"],"Les deux camps s'opposent sans guerre directe."),
+q("Que signifie monde bipolaire ?","Un monde organisé autour de deux puissances opposées",["Un monde organisé autour de deux puissances opposées","Un monde sans frontières","Un monde sans guerre","Un monde uniquement européen"],"La guerre froide oppose deux blocs."),
+q("Quel modèle défendent les États-Unis ?","Démocratie libérale et capitalisme",["Démocratie libérale et capitalisme","Communisme soviétique","Monarchie absolue","Colonisation uniquement"],"C'est le modèle du bloc de l'Ouest."),
+q("Quel modèle défend l'URSS ?","Communisme et parti unique",["Communisme et parti unique","Capitalisme libéral","Monarchie parlementaire","Union européenne"],"C'est le modèle du bloc de l'Est.")
+]},
+emc:{title:"Programme d'EMC",icon:"⚖️",color:"#ffedd5",questions:[
+q("Quel est le thème annuel d'EMC ?","S'engager et débattre en démocratie autour des défis de société",["S'engager et débattre en démocratie autour des défis de société","La guerre froide","Les ressources minières","La monarchie"],"L'EMC étudie l'engagement, le débat et les défis contemporains."),
+q("Quelle valeur permet l'existence d'opinions différentes ?","Le pluralisme",["Le pluralisme","La censure","Le parti unique","L'obéissance absolue"],"Le pluralisme est essentiel en démocratie."),
+q("Quel droit permet d'exprimer publiquement ses idées ?","La liberté d'expression",["La liberté d'expression","Le rationnement","La décolonisation","Le protectionnisme"],"Elle permet le débat démocratique."),
+q("Quels sont les trois grands défis étudiés ?","Environnement, biotechnologies et numérique",["Environnement, biotechnologies et numérique","Monarchie, féodalité et croisades","Colonisation, empire et guerre","Agriculture, artisanat et chevalerie"],"Ces défis interrogent nos choix démocratiques.")
+]}
+};
+
+function shuffle(a){const c=[...a];for(let i=c.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[c[i],c[j]]=[c[j],c[i]];}return c;}
+function makeDateQuestions(){
+ return historyDates.map(([date,event,explanation])=>{
+  const findEvent=Math.random()<0.5;
+  const answer=findEvent?event:date;
+  const pool=historyDates.map(d=>findEvent?d[1]:d[0]).filter(v=>v!==answer);
+  return {question:findEvent?`Quel événement correspond à cette date : ${date} ?`:`Quelle date correspond à cet événement : ${event} ?`,answer,choices:shuffle([...new Set(pool)]).slice(0,3).concat(answer),explanation};
+ });
+}
+function buildQuizzes(){
+ const quizzes={...base,histoireDates:{title:"Dates d'histoire",icon:"📅",color:"#fef9c3",questions:makeDateQuestions()}};
+ quizzes.general={title:"Quiz général",icon:"🎯",color:"#e2e8f0",questions:shuffle(Object.values(quizzes).flatMap(q=>q.questions))};
+ return quizzes;
+}
+let quizzes=buildQuizzes();
+const order=["general","francaisReferences","francaisCours","geo","histoireCours","histoireDates","emc"];
+let state={screen:"home",quizId:null,mode:"easy",questions:[],index:0,selected:null,showAnswer:false,score:0,results:JSON.parse(localStorage.getItem("revisepro-results")||"{}")};
+function save(){localStorage.setItem("revisepro-results",JSON.stringify(state.results));}
+function bar(v){const cls=v>=80?"green":v>=50?"orange":v>0?"red":"";return `<div class="bar"><div class="fill ${cls}" style="width:${Math.min(100,v||0)}%"></div></div>`}
+function avg(){const keys=order.flatMap(id=>[`${id}-easy`,`${id}-hard`]);return Math.round(keys.reduce((s,k)=>s+(state.results[k]?.best||0),0)/keys.length);}
+function render(){
+ const app=document.getElementById("app");
+ if(state.screen==="home"){
+  app.innerHTML=`<div class="wrap"><header class="center"><div class="pill">🎯 Révision Terminale Bac Pro</div><h1>Tableau de bord des quiz</h1><p>Choisis une matière, puis ton niveau : facile ou difficile.</p></header>
+  <div class="card"><div class="topline"><h2>📊 Progression générale</h2><h2>${avg()}%</h2></div>${bar(avg())}</div>
+  <div class="grid">${order.map(id=>{const quiz=quizzes[id];const e=state.results[`${id}-easy`]?.best;const h=state.results[`${id}-hard`]?.best;return `<div class="card"><div class="icon" style="background:${quiz.color}">${quiz.icon}</div><h3>${quiz.title}</h3><p>Facile : QCM / Difficile : réponse dans la tête</p><div><b>Mode facile</b><span style="float:right">${e==null?"—":e+"%"}</span>${bar(e||0)}</div><div style="margin-top:10px"><b>Mode difficile</b><span style="float:right">${h==null?"—":h+"%"}</span>${bar(h||0)}</div><div class="btnrow" style="margin-top:14px"><button onclick="startQuiz('${id}','easy')">Facile</button><button class="secondary" onclick="startQuiz('${id}','hard')">Difficile</button></div></div>`}).join("")}</div><div class="center"><button class="secondary" onclick="resetScores()">Réinitialiser les scores</button></div></div>`;
+  return;
+ }
+ if(state.screen==="result"){
+  const percent=Math.min(100,Math.round((state.score/state.questions.length)*100));
+  app.innerHTML=`<div class="wrap" style="max-width:700px"><div class="card center"><div style="font-size:50px">🏆</div><h1>Résultat du quiz</h1><p>${quizzes[state.quizId].title} — mode ${state.mode==="easy"?"facile":"difficile"}</p><p>Score : ${state.score} / ${state.questions.length} — ${percent}%</p>${bar(percent)}<div class="btnrow" style="margin-top:20px"><button onclick="startQuiz('${state.quizId}','${state.mode}')">Refaire ce quiz</button><button class="secondary" onclick="goHome()">Retour au menu</button></div></div></div>`;
+  return;
+ }
+ const cur=state.questions[state.index]; const hard=state.mode==="hard"; const answered=state.selected!==null; const isCorrect=hard?state.selected==="correct":state.selected===cur.answer; const prog=Math.round(((state.index+(answered?1:0))/state.questions.length)*100);
+ app.innerHTML=`<div class="wrap" style="max-width:800px"><header class="center"><button class="secondary" onclick="goHome()">Menu</button><h1>${quizzes[state.quizId].title}</h1><p>Mode ${hard?"difficile":"facile"} — Question ${state.index+1} / ${state.questions.length}</p></header><div><div class="topline"><b>Progression</b><b>${prog}% — Score : ${state.score} / ${state.index+(answered?1:0)}</b></div>${bar(prog)}</div>
+ <div class="card questionCard ${answered?(isCorrect?"correct":"wrong"):""}"><h2>${cur.question}</h2>
+ ${!hard?`<div class="grid">${cur.choices.map(ch=>`<button class="choice ${answered&&ch===cur.answer?"correct":answered&&ch===state.selected&&ch!==cur.answer?"wrong":""}" onclick="choose('${encodeURIComponent(ch)}')">${ch}</button>`).join("")}</div>`:""}
+ ${hard?`<div>${!state.showAnswer?`<button style="width:100%;font-size:18px;padding:18px" onclick="showAnswer()">Afficher la réponse</button>`:`<div class="answerBox"><p><b>Réponse attendue</b></p><h2>${cur.answer}</h2><p>${cur.explanation}</p>${!answered?`<div class="btnrow"><button class="green" onclick="selfAssess(true)">👍 Je savais</button><button class="red" onclick="selfAssess(false)">👎 Je ne savais pas</button></div>`:""}</div>`}</div>`:""}
+ ${!hard&&answered?`<div class="answerBox"><b>Explication</b><p>${cur.explanation}</p>${!isCorrect?`<p><b>Bonne réponse :</b> ${cur.answer}</p>`:""}</div>`:""}
+ ${answered?`<div style="text-align:right;margin-top:18px"><button onclick="nextQuestion()">${state.index===state.questions.length-1?"Voir le résultat":"Question suivante"}</button></div>`:""}</div></div>`;
+}
+function startQuiz(id,mode){quizzes=buildQuizzes();state.quizId=id;state.mode=mode;state.questions=shuffle(quizzes[id].questions).slice(0,Math.min(20,quizzes[id].questions.length)).map(q=>({...q,choices:shuffle(q.choices)}));state.index=0;state.selected=null;state.showAnswer=false;state.score=0;state.screen="quiz";render();}
+function choose(encoded){if(state.selected)return;const choice=decodeURIComponent(encoded);state.selected=choice;if(choice===state.questions[state.index].answer)state.score++;render();}
+function showAnswer(){state.showAnswer=true;render();}
+function selfAssess(ok){if(state.selected)return;state.selected=ok?"correct":"wrong";if(ok)state.score++;render();}
+function nextQuestion(){if(state.index===state.questions.length-1){const percent=Math.min(100,Math.round((state.score/state.questions.length)*100));const key=`${state.quizId}-${state.mode}`;state.results[key]={last:percent,best:Math.max(state.results[key]?.best||0,percent)};save();state.screen="result";}else{state.index++;state.selected=null;state.showAnswer=false;}render();}
+function goHome(){state.screen="home";render();}
+function resetScores(){state.results={};save();render();}
+render();
+</script>
+</body>
+</html>
